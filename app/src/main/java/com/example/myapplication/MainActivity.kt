@@ -27,39 +27,46 @@ class MainActivity : AppCompatActivity() {
 
             // Make the text view scrollable
             textView.movementMethod = ScrollingMovementMethod()
-        }
-        catch (e : Exception){
+        } catch (e: Exception) {
             tvInfo.text = e.toString()
         }
 
         // Insert button click listener
-        btnInsert.setOnClickListener{
+        btnInsert.setOnClickListener {
             // Initialize a new student
-            val student = Event(null, UUID.randomUUID().toString(),"----1----")
+            val student = Event(null, UUID.randomUUID().toString(), Calendar.getInstance())
 
             doAsync {
                 // Put the student in database
-                mDb.eventDao().insert(student)
+                try {
+                    mDb.eventDao().insert(student)
 
-                uiThread {
-                    toast("One record inserted.")
+                    uiThread {
+                        toast("One record inserted.")
+                    }
+                } catch (e: Exception) {
+                    tvInfo.text = e.toString()
                 }
             }
         }
 
         // Select button click listener
-        btnSelect.setOnClickListener{
+        btnSelect.setOnClickListener {
             doAsync {
                 // Get the student list from database
-                val list = mDb.eventDao().getAll()
+                try {
+                    val list = mDb.eventDao().getAll()
 
-                uiThread {
-                    toast("${list.size} records found.")
-                    // Display the students in text view
-                    textView.text = ""
-                    for (student in list){
-                        textView.append("${student.id} : ${student.description} : ${student.date}\n")
+                    uiThread {
+                        toast("${list.size} records found.")
+                        // Display the students in text view
+                        textView.text = ""
+                        for (student in list) {
+                            textView.append("${student.id} : ${student.description} : ${student.getCalendar().time}\n")
+                        }
                     }
+                } catch (e: Exception) {
+                    tvInfo.text = e.toString()
                 }
             }
         }
